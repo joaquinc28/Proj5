@@ -32,16 +32,17 @@ size_t NodeCount() const;
 TNodeID GetSortedNodeIDByIndex(size_t index) const;
 
 // Returns the location of the node that is returned by GetSortedNodeIDByIndex when passed index, returns  
-// std::make_pair(180.0, 360.0)on errorTLocation   
-GetSortedNodeLocationByIndex(size_t index) const;
+// std::make_pair(180.0, 360.0)on error  
+TLocation GetSortedNodeLocationByIndex(size_t index) const;
 
-// Returns the location of the node specified by nodeid, returns std::make_pair(180.0, 360.0) on errorTLocation     GetNodeLocationByID(TNodeID nodeid) const;
+// Returns the location of the node specified by nodeid, returns std::make_pair(180.0, 360.0) on error  
+TLocation GetNodeLocationByID(TNodeID nodeid) const;
 
-// Returns the node ID of the stop ID specifiedTNodeID  
-GetNodeIDByStopID(TStopID stopid) const;
+// Returns the node ID of the stop ID specified  
+TNodeID GetNodeIDByStopID(TStopID stopid) const;
 
-// Returns the number of bus routessize_t   
-RouteCount() const;
+// Returns the number of bus routes  
+size_t RouteCount() const;
 
 // Returns the name of the bus route specified by the index of the bus routes in sorted order  
 std::string GetSortedRouteNameByIndex(size_t index) const;
