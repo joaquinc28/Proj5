@@ -13,6 +13,10 @@ class CMapRouter{
         
         static const TNodeID InvalidNodeID;
     private:
+	struct edge;
+	struct node;
+	std::unordered_map<TNodeID, int index> location;
+	std::vector<node>list;
         
     public:
         
