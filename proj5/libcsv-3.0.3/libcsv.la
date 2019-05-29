@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/hsgoraya/ECS34Proj4/proj4/lib'
+libdir='/home/hsgoraya/Proj5/proj5/lib'
