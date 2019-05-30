@@ -40,11 +40,95 @@ double CMapRouter::CalculateBearing(double lat1, double lon1,double lat2, double
 }
 
 bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::istream &routes){
-    // Your code HERE
+    CXMLReader reader(osm);
+    SXMLEntity TempEnt;
+
+    reader.ReadEntity(TempEnt);
+    if(TempEnt.DType != SXMLEntity::EType::StartElement or TempEnt.DNameData != "osm"){
+        return false;
+    }
+    while(!reader.End()){
+        if(TempEnt.DType == SXMLEntity::EType::StartElement){
+            if(TempEnt.DNameData == "node"){
+                TNodeID  TempId = std::stoul(TempEnt.AttributeValue("id"));
+                double TempLat = std::stoul(TempEnt.AttributeValue("lat"));
+                double TempLon = std::stoul(TempEnt.AttributeValue("lon"));
+                node TempNode;
+                TempNode.nodeid = TempId;
+                TempNode.location = std::make_pair(TempLat, TempLon);
+                position.emplace(TempId,nodes.size());
+                nodes.push_back(TempNode);
+                SortedIds.push_back(TempId);
+            }
+
+            else if(TempEnt.DNameData == "way"){
+                bool oneway = false;
+                int speed_limit = 25;
+                std::vector<TnodeIndex> wayorder;
+                while(!reader.End()){
+                    reader.ReadEntity(TempEnt);
+                    if(TempEnt.DType == SXMLEntity::EType::EndElement){
+                        if(TempEnt.DNameData == "way"){
+                            break;
+                        }
+                    }
+                    if(TempEnt.DType == SXMLEntity::EType::StartElement){
+                        if(TempEnt.DNameData == "nd"){
+                            auto lookup = position.find(std::stoul(TempEnt.AttributeValue("ref")));
+                            if(lookup != position.end()){
+                                wayorder.push_back(lookup->second);
+
+                            }
+                        }
+                        if(TempEnt.DNameData == "tag"){
+                            if(TempEnt.AttributeValue("k") == "oneway"){
+                                if(TempEnt.AttributeValue("v") == "yes"){
+                                    oneway = true;
+                                }
+                            }
+                        }
+                        if(TempEnt.AttributeValue("k") == "maxspeed"){
+                            std::string speed = TempEnt.AttributeValue("v");
+                            int npos = speed.find_first_of(" ");
+                            std::string speed1 = speed.substr(0,npos);
+                            speed_limit = std::stoul(speed1);
+
+                        }
+                    }
+                }
+
+                for(int i = 0; i < wayorder.size() - 1 ;i++){
+                    edge tempedge;
+                    tempedge.ConnectedNode = wayorder[i + 1];
+                    tempedge.speed = speed_limit;
+                    double distance = HaversineDistance(nodes[wayorder[i]].location.first,
+                                                          nodes[wayorder[i]].location.second,
+                                                          nodes[wayorder[i + 1]].location.first,
+                                                          nodes[wayorder[i + 1]].location.second);
+                    tempedge.distance = distance;
+                    nodes[wayorder[i]].edges.push_back(tempedge);
+                    if(!oneway) {
+                        edge edge2;
+                        edge2.ConnectedNode = wayorder[i];
+                        edge2.speed = speed_limit;
+                        edge2.distance = distance;
+                        nodes[wayorder[i + 1]].edges.push_back(edge2);
+
+                    }
+
+
+                }
+
+                }
+
+            }
+        }
+
 }
 
 size_t CMapRouter::NodeCount() const{
     // Your code HERE
+    return nodes.size();
 }
 
 CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
