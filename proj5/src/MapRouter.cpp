@@ -1,6 +1,6 @@
 #include "MapRouter.h"
 #include <cmath>
-
+#include <iostream>
 const CMapRouter::TNodeID CMapRouter::InvalidNodeID = -1;
 
 CMapRouter::CMapRouter(){
@@ -134,7 +134,24 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
 
             }
         }
-    printf("Not logical value at line number %d \n",__LINE__);
+    for(auto c:nodes){
+        std::cout<<c.nodeid<<std::endl;
+	std::cout<<c.location.first<<std::endl;
+        std::cout<<c.location.second<<std::endl;
+
+    }
+    for(int i = 0; i < nodes.size() - 1; i++){
+        if (nodes[i].edges.size() == 1) {
+            std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
+        }
+	if(nodes[i].edges.size() == 2){
+            std::cout<<nodes[i].edges[1].ConnectedNode<<std::endl;
+        }
+        if(nodes[i].edges.size() == 3){
+            std::cout<<nodes[i].edges[2].ConnectedNode<<std::endl;
+        }
+    }
+
 return true;
 }
 
