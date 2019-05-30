@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <istream>
+#include <unordered_map>
 
 class CMapRouter{
     public:
@@ -15,8 +16,7 @@ class CMapRouter{
     private:
 	struct edge;
 	struct node;
-	std::unordered_map<TNodeID, int index> location;
-	std::vector<node>list;
+	std::unordered_map<TNodeID, int> location;
         
     public:
         
