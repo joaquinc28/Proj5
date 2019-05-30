@@ -48,6 +48,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
         return false;
     }
     while(!reader.End()){
+	    reader.ReadEntity(TempEnt);
 	    printf("Not logical value at line number %d \n",__LINE__);
 	if(TempEnt.DType == SXMLEntity::EType::EndElement){
 	    if(TempEnt.DNameData == "osm"){
