@@ -48,8 +48,17 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
         return false;
     }
     while(!reader.End()){
+	    printf("Not logical value at line number %d \n",__LINE__);
+	if(TempEnt.DType == SXMLEntity::EType::EndElement){
+	    if(TempEnt.DNameData == "osm"){
+		    printf("Not logical value at line number %d \n",__LINE__);
+	         break;
+	    }
+	}	    
         if(TempEnt.DType == SXMLEntity::EType::StartElement){
+		printf("Not logical value at line number %d \n",__LINE__);
             if(TempEnt.DNameData == "node"){
+		    printf("Not logical value at line number %d \n",__LINE__);
                 TNodeID  TempId = std::stoul(TempEnt.AttributeValue("id"));
                 double TempLat = std::stoul(TempEnt.AttributeValue("lat"));
                 double TempLon = std::stoul(TempEnt.AttributeValue("lon"));
@@ -66,6 +75,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                 int speed_limit = 25;
                 std::vector<TnodeIndex> wayorder;
                 while(!reader.End()){
+			printf("Not logical value at line number %d \n",__LINE__);
                     reader.ReadEntity(TempEnt);
                     if(TempEnt.DType == SXMLEntity::EType::EndElement){
                         if(TempEnt.DNameData == "way"){
@@ -123,7 +133,8 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
 
             }
         }
-
+    printf("Not logical value at line number %d \n",__LINE__);
+return true;
 }
 
 size_t CMapRouter::NodeCount() const{
