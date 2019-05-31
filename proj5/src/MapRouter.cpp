@@ -162,14 +162,18 @@ size_t CMapRouter::NodeCount() const{
 
 CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
     // Your code HERE
+    return nodes[index].nodeid;
 }
 
 CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) const{
     // Your code HERE
+    return nodes[index].location;
 }
 
 CMapRouter::TLocation CMapRouter::GetNodeLocationByID(TNodeID nodeid) const{
     // Your code HERE
+    int index = position.at(nodeid);
+    return nodes[index].location;
 }
 
 CMapRouter::TNodeID CMapRouter::GetNodeIDByStopID(TStopID stopid) const{
