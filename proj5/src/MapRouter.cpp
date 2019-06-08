@@ -297,7 +297,18 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
             }
 	}
     }
-     
+	for (const auto &p : NodeIDsToBusEdge){
+        	TnodeIndex source = p.first.first;
+        	TnodeIndex dest = p.first.second;
+        	edge busedge;
+        	busedge.distance = p.second.distance;
+        	busedge.time = p.second.time;
+        	busedge.busedge = true;
+        	busedge.ConnectedNode = dest;
+        	nodes[source].edges.push_back(busedge);
+        
+
+    }
 return true;
 }
 
