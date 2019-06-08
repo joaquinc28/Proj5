@@ -14,7 +14,7 @@ CMapRouter::~CMapRouter(){
 
 }
 double CMapRouter::dkystra(CMapRouter::TnodeIndex src, CMapRouter::TnodeIndex dest,
-                           std::vector<CMapRouter::TnodeIndex> &path, int searchtype) {
+                           std::vector<CMapRouter::TNodeID> &path, int searchtype) {
     std::vector<TnodeIndex > prev(nodes.size());
     std::vector<double>distance(nodes.size(),std::numeric_limits<double>::max());
     std::vector<TNodeID > heap;
@@ -55,6 +55,20 @@ double CMapRouter::dkystra(CMapRouter::TnodeIndex src, CMapRouter::TnodeIndex de
     if(distance[dest] == std::numeric_limits<double>::max()){
        return false;
 }
+   auto temp = dest;
+   std::vector<TnodeIndex>path1;
+    while(temp != src){
+        path1.push_back(temp);
+        temp = prev[temp];
+    }
+   path1.push_back(src);
+   std::reverse(path1.begin(),path1.end());
+   for(auto &c:path1){
+	auto ID = NodeIdToIndex.find(c)->second;
+        path.push_back(ID);
+
+    }
+   
    return distance[dest];
 
 }
@@ -115,6 +129,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                 TempNode.nodeid = TempId;
                 TempNode.location = std::make_pair(TempLat, TempLon);
                 position.emplace(TempId,nodes.size());
+		NodeIdToIndex[nodes.size()] = TempId;
                 nodes.push_back(TempNode);
                 SortedIds.push_back(TempId);
             }
@@ -312,7 +327,7 @@ double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNod
     auto lookup2 = position.find(dest);
     auto NewDest = lookup2->second;
     std::vector< TnodeIndex > path1;
-    return dkystra(NewSrc,NewDest,path1,0);
+    return dkystra(NewSrc,NewDest,path,0);
     // Your code HERE
 }
 

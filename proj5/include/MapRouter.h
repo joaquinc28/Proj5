@@ -46,13 +46,15 @@ class CMapRouter{
         //vector routenames
 
         };
-         double dkystra(TnodeIndex src,TnodeIndex dest,std::vector<TnodeIndex> &path,int searchtype);
+         double dkystra(TnodeIndex src,TnodeIndex dest,std::vector<TNodeID> &path,int searchtype);
         std::vector<node>nodes;
 	std::unordered_map<TNodeID, int> position;
         std::vector<unsigned long>SortedIds;
         std::vector<BusRoutes>Routes;
         std::map<unsigned long,TnodeIndex>StopIDToNodeIndex;
         std::map<TnodeIndex,unsigned long>NodeIdToStopID;
+
+	    std::unordered_map<TnodeIndex,unsigned long>NodeIdToIndex;
 
         std::vector<std::string>BusRouteNames;
 
