@@ -13,6 +13,51 @@ CMapRouter::CMapRouter(){
 CMapRouter::~CMapRouter(){
 
 }
+double CMapRouter::dkystra(CMapRouter::TnodeIndex src, CMapRouter::TnodeIndex dest,
+                           std::vector<CMapRouter::TnodeIndex> &path, int searchtype) {
+    std::vector<TnodeIndex > prev(nodes.size());
+    std::vector<double>distance(nodes.size(),std::numeric_limits<double>::max());
+    std::vector<TNodeID > heap;
+    auto compare = [&distance](TnodeIndex idx, TnodeIndex idx2){return distance[idx] < distance[idx2];};
+
+    prev[src] = src;
+    distance[src] = 0.0;
+    heap.push_back(src);
+    while(!heap.empty()){
+        std::make_heap(heap.begin(),heap.end(),compare);
+        std::pop_heap(heap.begin(),heap.end(),compare);
+        auto curr  = heap.back();
+        heap.pop_back();
+        for(auto &edge: nodes[curr].edges){
+            double edgedist;
+            switch(searchtype){
+                case 0: edgedist = edge.distance;
+                        break;
+                case 1: edgedist = edge.time;
+                        break;
+                case 2: edgedist = edge.distance / edge.speed;//speedlimit
+                         break;
+
+            }
+            auto altdist = distance[curr] + edgedist;
+            if(altdist < distance[edge.ConnectedNode]){
+                if(distance[edge.ConnectedNode] == std::numeric_limits<double>::max()){
+                    heap.push_back(edge.ConnectedNode);
+                }
+                distance[edge.ConnectedNode] = altdist;
+                prev[edge.ConnectedNode] = curr;
+            }
+
+        }
+
+    }
+
+    if(distance[dest] == std::numeric_limits<double>::max()){
+       return false;
+}
+   return distance[dest];
+
+}
 
 double CMapRouter::HaversineDistance(double lat1, double lon1, double lat2, double lon2){
     auto DegreesToRadians = [](double deg){return M_PI * (deg) / 180.0;};
@@ -120,12 +165,14 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                                                           nodes[wayorder[i + 1]].location.first,
                                                           nodes[wayorder[i + 1]].location.second);
                     tempedge.distance = distance;
+		    tempedge.time = distance / 3;
                     nodes[wayorder[i]].edges.push_back(tempedge);
                     if(!oneway) {
                         edge edge2;
                         edge2.ConnectedNode = wayorder[i];
                         edge2.speed = speed_limit;
                         edge2.distance = distance;
+			edge2.time = distance / 3;
                         nodes[wayorder[i + 1]].edges.push_back(edge2);
 
                     }
@@ -260,6 +307,12 @@ bool CMapRouter::GetRouteStopsByRouteName(const std::string &route, std::vector<
 }
 
 double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNodeID > &path){
+	auto lookup = position.find(src);
+    auto NewSrc = lookup->second;
+    auto lookup2 = position.find(dest);
+    auto NewDest = lookup2->second;
+    std::vector< TnodeIndex > path1;
+    return dkystra(NewSrc,NewDest,path1,0);
     // Your code HERE
 }
 

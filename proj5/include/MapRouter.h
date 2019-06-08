@@ -23,7 +23,7 @@ class CMapRouter{
                 TLocation location;
                 bool oneway;
                 int speed;
-                int distance;
+                double distance;
 		double time;
 		bool busedge = false;
 	};
@@ -46,7 +46,7 @@ class CMapRouter{
         //vector routenames
 
         };
-
+         double dkystra(TnodeIndex src,TnodeIndex dest,std::vector<TnodeIndex> &path,int searchtype);
         std::vector<node>nodes;
 	std::unordered_map<TNodeID, int> position;
         std::vector<unsigned long>SortedIds;
