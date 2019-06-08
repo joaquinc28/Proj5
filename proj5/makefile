@@ -96,4 +96,5 @@ clean:
 	rm -f include/csv.h
 	cd $(LIBCSVDIR); make clean; cd ..
 	rm -f $(LIBCSVDIR)/makefile
+	rm -f *.o core
 

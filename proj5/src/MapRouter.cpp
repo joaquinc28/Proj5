@@ -140,15 +140,24 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
         std::cout<<c.location.second<<std::endl;
 
     }
-    for(int i = 0; i < nodes.size() - 1; i++){
+    for(int i = 0; i < nodes.size(); i++){
         if (nodes[i].edges.size() == 1) {
             std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
+	    std::cout<<nodes[i].edges[0].distance<<std::endl;
         }
 	if(nodes[i].edges.size() == 2){
+	    std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
             std::cout<<nodes[i].edges[1].ConnectedNode<<std::endl;
+	    std::cout<<nodes[i].edges[0].distance<<std::endl;
+	    std::cout<<nodes[i].edges[1].distance<<std::endl;
         }
         if(nodes[i].edges.size() == 3){
+	    std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
+            std::cout<<nodes[i].edges[1].ConnectedNode<<std::endl;
             std::cout<<nodes[i].edges[2].ConnectedNode<<std::endl;
+	    std::cout<<nodes[i].edges[0].distance<<std::endl;
+	    std::cout<<nodes[i].edges[1].distance<<std::endl;
+	    std::cout<<nodes[i].edges[2].distance<<std::endl;
         }
     }
 
@@ -170,6 +179,12 @@ CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) con
 
 CMapRouter::TLocation CMapRouter::GetNodeLocationByID(TNodeID nodeid) const{
     // Your code HERE
+        auto lookup = position.find(nodeid);
+    int index = lookup->second;
+    TLocation locate;
+    locate.first = nodes[index].location.first;
+    locate.second = nodes[index].location.second;
+    return locate;
 }
 
 CMapRouter::TNodeID CMapRouter::GetNodeIDByStopID(TStopID stopid) const{
