@@ -200,6 +200,49 @@ bool CMapRouter::GetRouteStopsByRouteName(const std::string &route, std::vector<
     // Your code HERE
 }
 
+double CMapRouter::Dijkstra(TnodeIndex src, TnodeIndex dest, std::vector<TnodeIndex> &path, int searchtype){
+    std::vector<TnodeIndex> Previous(Nodes.size()); //vector of Previous nodes
+    std::vector<double> Distance(Nodes.size(), std::numeric_limits<double>::max()); //vector of distances to src node, initialized to infinity
+    std::vector<TnodeIndex> Heap; //initialize heap as empty vector
+    auto Compare = [&Distance] (TnodeIndex idx1, TnodeIndex idx2) {return Distance[idx1] < Distance[idx2];}; //returns true if dist idx1 < idx2
+    Previous[src] = src; 
+    Distance[src] = 0.0;
+    Heap.push_back(src);
+
+    while(!Heap.empty()) {
+        std::make_heap(Heap.begin(), Heap.end(), Compare);
+        std::pop_heap(Heap.begin(), Heap.end(), Compare);
+        auto Current = Heap.back();
+        Heap.pop_back();
+        for(auto &Edge : Nodes[Current].Edges) { //iterate through neighboring edges of current node (popped from heap)
+            double EdgeDistance;
+            switch(searchtype) {
+                case 0: EdgeDistance = Edge.Distance;
+                        break;
+                case 1: EdgeDistance = Edge.Time;
+                        break;
+                default EdgeDistance = Edge.Distance/Edge.SpeedLimit;
+                        break;
+            }
+            auto AltDistance = Distance[Current] + EdgeDistance;
+            if (AltDistance < Distance[Edge.ConnectedNode]) {
+                if(Distance[Edge.ConnectedNide] == std::numeric_limit<double>::max()) {
+                    Heap.push_back(Edge.ConnectedNode);
+                }
+                Distance[Edge.ConnectedNode] = AltDistance;
+                Previous[Edge.ConnectedNode] = Current;
+            }
+        }
+    }
+
+    if(Distance[dest] == std::numeric_limits<double>::max()){
+        return std::numeric_limits<double>::max();
+    }
+    else {
+        return Distance[dest]; 
+    }
+}
+
 double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNodeID > &path){
     // Your code HERE
 }

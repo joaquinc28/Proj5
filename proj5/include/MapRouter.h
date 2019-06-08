@@ -16,7 +16,7 @@ class CMapRouter{
         static const TNodeID InvalidNodeID;
     private:
         using TnodeIndex = int;
-        struct edge {
+        struct Edge {
             TnodeIndex ConnectedNode;
             TLocation location;
             bool oneway;
@@ -24,7 +24,7 @@ class CMapRouter{
             double speed;
             double distance;
         };
-        struct node {
+        struct Node {
             TNodeID  nodeid;
             TLocation location;
             std::vector<edge>edges;
@@ -35,7 +35,7 @@ class CMapRouter{
         }
 
         std::vector<node>nodes;
-        std::unordered_map<TNodeID, int> position;
+        std::unordered_map<TNodeID, TnodeIndex> position;
         std::vector<unsigned long>SortedIds;
 
         std::map<TStopID, TnodeIndex> StopToNodeTranslation;
@@ -86,7 +86,9 @@ class CMapRouter{
         // Fills the stops vector with the stops of the bus route specified by route
         bool GetRouteStopsByRouteName(const std::string &route, std::vector< TStopID > &stops);
 
-
+        //Implementation of Dijkstra's shortest path algorithm
+        double Dijkstra(TnodeIndex src, TnodeIndex dest, std::vector<TnodeIndex> &path, int searchtype);
+        
         // Finds the shortest path from the src node to dest node. The list of nodes visited will be filled in path. The return
         // value is the distance in miles, std::numeric_limits::max() is returned if no path exists.
         double FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNodeID > &path);
