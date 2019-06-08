@@ -259,6 +259,37 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
     }
     std::cout<<Routes[0].stops.size()<<std::endl;
 
+     for(int i = 0; i < Routes.size();i++){
+        std::string Routename = Routes[i].name;
+        for(auto &c : Routes[i].stops){
+	    auto busIDS = std::make_pair(c, c + 1);
+            if (NodeIDsToBusEdge.find(busIDS) == NodeIDsToBusEdge.end()) {
+            	BusEdge TempBusedge;
+            	std::vector<TNodeID>path;
+		                std::vector<TNodeID>path1;
+            	TempBusedge.Routes.push_back(Routename);
+            	TempBusedge.time = dkystra(c,c+1,path,2);
+            	TempBusedge.distance = dkystra(c,c+1,path1,0);
+            	for(auto &c:path1){
+                	TnodeIndex nodeindex = NodeIdToIndex.find(c)->second;
+                	TempBusedge.path.push_back(nodeindex);
+            	}	
+            	std::cout<<TempBusedge.time<<std::endl;
+            	std::cout<<TempBusedge.distance<<std::endl;
+                for(int i = 0;i<TempBusedge.path.size();i++){
+                    std::cout<<TempBusedge.path[i]<<std::endl;
+                }		
+
+            	NodeIDsToBusEdge[busIDS] = TempBusedge;
+		std::cout<<NodeIDsToBusEdge[busIDS].Routes[0]<<std::endl;
+
+           }
+	    else{
+                NodeIDsToBusEdge[busIDS].Routes.push_back(Routename);
+            }
+	}
+    }
+     
 return true;
 }
 

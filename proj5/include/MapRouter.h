@@ -39,7 +39,7 @@ class CMapRouter{
         struct BusEdge{
         std::vector<std::string>Routes;
         double time;
-        std::vector<TnodeIndex>yee;
+        std::vector<TnodeIndex>path;
 	int distance;
         //time
         //vector path
@@ -57,9 +57,21 @@ class CMapRouter{
 	    std::unordered_map<TnodeIndex,unsigned long>NodeIdToIndex;
 
         std::vector<std::string>BusRouteNames;
+        struct pair_hash {
+		template <class T1, class T2>
+                std::size_t operator () (const std::pair<T1,T2> &p) const {
+                auto h1 = std::hash<T1>{}(p.first);
+        	auto h2 = std::hash<T2>{}(p.second);
+
+        	// Mainly for demonstration purposes, i.e. works but is overly simple
+        	// In the real world, use sth. like boost.hash_combine
+        	return h1 ^ h2;  
+    		}
+ 	};
 
         std::map<std::string,BusRoutes>map;
-
+        using busedge = std::pair<TnodeIndex,TnodeIndex>;
+	std::unordered_map<busedge,BusEdge,pair_hash>NodeIDsToBusEdge;
 
     public:
         
