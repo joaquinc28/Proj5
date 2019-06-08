@@ -387,7 +387,34 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
     auto lookup2 = position.find(dest);
     auto NewDest = lookup2->second;
     std::vector< TNodeID > path1;
-    return dkystra(NewSrc,NewDest,path1,1);
+     std::vector<TnodeIndex > prev(nodes.size());
+    std::vector<double>distance(nodes.size(),std::numeric_limits<double>::max());
+    std::vector<TNodeID > heap;
+    auto compare = [&distance](TnodeIndex idx, TnodeIndex idx2){return distance[idx] < distance[idx2];};
+
+    prev[NewSrc] = NewSrc;
+    distance[NewSrc] = 0.0;
+    double altdistance = 0.0;
+    heap.push_back(NewSrc);
+    while(!heap.empty()){
+        std::make_heap(heap.begin(),heap.end(),compare);
+        std::pop_heap(heap.begin(),heap.end(),compare);
+        auto curr  = heap.back();
+        heap.pop_back();
+        for(auto &edge: nodes[curr].edges){
+            altdistance = distance[curr] + edge.time;
+            if(altdistance < distance[edge.ConnectedNode]){
+                if(distance[edge.ConnectedNode] == std::numeric_limits<double>::max()){
+                    heap.push_back(edge.ConnectedNode);
+                }
+                distance[edge.ConnectedNode] = altdistance;
+                prev[edge.ConnectedNode] = curr;
+            }
+        }
+
+    }
+
+    return distance[NewDest];
 }
 
 bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::vector< std::string > &desc) const{
