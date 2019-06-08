@@ -130,6 +130,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                 TempNode.location = std::make_pair(TempLat, TempLon);
                 position.emplace(TempId,nodes.size());
 		NodeIdToIndex[nodes.size()] = TempId;
+
                 nodes.push_back(TempNode);
                 SortedIds.push_back(TempId);
             }
@@ -258,20 +259,27 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
 
     }
     std::cout<<Routes[0].stops.size()<<std::endl;
+    for(auto c:Routes[0].stops){
+        std::cout<<c<<std::endl;
+    }
+    std::cout<<"please"<<std::endl;
 
      for(int i = 0; i < Routes.size();i++){
         std::string Routename = Routes[i].name;
-        for(auto &c : Routes[i].stops){
-	    auto busIDS = std::make_pair(c, c + 1);
+        for(int j = 0;j < Routes[i].stops.size() - 1;j++){
+	    auto busIDS = std::make_pair(Routes[i].stops[j], Routes[i].stops[j+1]);
             if (NodeIDsToBusEdge.find(busIDS) == NodeIDsToBusEdge.end()) {
             	BusEdge TempBusedge;
             	std::vector<TNodeID>path;
-		                std::vector<TNodeID>path1;
+		std::vector<TNodeID>path1;
             	TempBusedge.Routes.push_back(Routename);
-            	TempBusedge.time = dkystra(c,c+1,path,2);
-            	TempBusedge.distance = dkystra(c,c+1,path1,0);
+            	TempBusedge.time = dkystra(Routes[i].stops[j], Routes[i].stops[j+1],path,2);
+            	TempBusedge.distance = dkystra(Routes[i].stops[j], Routes[i].stops[j+1],path1,0);
+		for(int i = 0;i<path1.size();i++){
+                    std::cout<<path1[i]<<std::endl;
+                }
             	for(auto &c:path1){
-                	TnodeIndex nodeindex = NodeIdToIndex.find(c)->second;
+                	TnodeIndex nodeindex = position.find(c)->second;
                 	TempBusedge.path.push_back(nodeindex);
             	}	
             	std::cout<<TempBusedge.time<<std::endl;

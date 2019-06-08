@@ -54,7 +54,7 @@ class CMapRouter{
         std::map<unsigned long,TnodeIndex>StopIDToNodeIndex;
         std::map<TnodeIndex,unsigned long>NodeIdToStopID;
 
-	    std::unordered_map<TnodeIndex,unsigned long>NodeIdToIndex;
+	    std::map<TnodeIndex,TNodeID>NodeIdToIndex;
 
         std::vector<std::string>BusRouteNames;
         struct pair_hash {
