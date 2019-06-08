@@ -1,6 +1,9 @@
 #include "MapRouter.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>
+#include <sstream>
+
 const CMapRouter::TNodeID CMapRouter::InvalidNodeID = -1;
 
 CMapRouter::CMapRouter(){
@@ -134,31 +137,60 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
 
             }
         }
-    for(auto c:nodes){
-        std::cout<<c.nodeid<<std::endl;
-	std::cout<<c.location.first<<std::endl;
-        std::cout<<c.location.second<<std::endl;
+        std::sort(SortedIds.begin(),SortedIds.end());
+       printf ("This line is %d.\n", __LINE__);
+	 CCSVReader readstops(stops);
+	 printf ("This line is %d.\n", __LINE__);
+    std::vector<std::string>header;
+    printf ("This line is %d.\n", __LINE__);
+    readstops.ReadRow(header);
+    size_t StopIndex, NodeIndex;
+    for(size_t index = 0; index<header.size();index++){
+        if(header[index] == "stop_id"){
+            StopIndex = index;
+        }
+        else if(header[index] == "node_id"){
+            NodeIndex = index;
+        }
+    }
+printf ("This line is %d.\n", __LINE__);
+    while(!readstops.End()){
+	    printf ("This line is %d.\n", __LINE__);
+        std::vector<std::string>stops;
+        readstops.ReadRow(stops);
+	auto lookup = position.find(std::stoul((stops[1])));
+        TnodeIndex PlaceInVector = lookup->second;
+	printf ("This line is %d.\n", __LINE__);
+	unsigned long stopid = std::stoul(stops[0]);
+        StopIDToNodeIndex[stopid] = PlaceInVector;
+	printf ("This line is %d.\n", __LINE__);
+        NodeIdToStopID[PlaceInVector] = stopid;
+	printf ("This line is %d.\n", __LINE__);
 
     }
-    for(int i = 0; i < nodes.size(); i++){
-        if (nodes[i].edges.size() == 1) {
-            std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
-	    std::cout<<nodes[i].edges[0].distance<<std::endl;
+
+    CCSVReader readroutes(routes);
+    std::vector<std::string>Header;
+    readroutes.ReadRow(Header);
+    std::string prev = Header[0];
+    //header row
+    while(!readroutes.End()){
+        std::vector<std::string>route;
+        readroutes.ReadRow(route);
+	if(route[0] == prev){
+            TnodeIndex stop = StopIDToNodeIndex.find(std::stoul(route[1]))->second;
+            Routes.back().stops.push_back(stop);
         }
-	if(nodes[i].edges.size() == 2){
-	    std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
-            std::cout<<nodes[i].edges[1].ConnectedNode<<std::endl;
-	    std::cout<<nodes[i].edges[0].distance<<std::endl;
-	    std::cout<<nodes[i].edges[1].distance<<std::endl;
+        else{
+            BusRoutes ARoute;
+            ARoute.name = route[0];
+            TnodeIndex Stopidindex = StopIDToNodeIndex.find(std::stoul(route[1]))->second;
+            ARoute.stops.push_back(Stopidindex);
+            Routes.push_back(ARoute);
         }
-        if(nodes[i].edges.size() == 3){
-	    std::cout<<nodes[i].edges[0].ConnectedNode<<std::endl;
-            std::cout<<nodes[i].edges[1].ConnectedNode<<std::endl;
-            std::cout<<nodes[i].edges[2].ConnectedNode<<std::endl;
-	    std::cout<<nodes[i].edges[0].distance<<std::endl;
-	    std::cout<<nodes[i].edges[1].distance<<std::endl;
-	    std::cout<<nodes[i].edges[2].distance<<std::endl;
-        }
+
+        prev = route[0];
+
     }
 
 return true;
@@ -171,7 +203,8 @@ size_t CMapRouter::NodeCount() const{
 
 CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
     // Your code HERE
-    return nodes[index].nodeid;
+       return SortedIds[index];
+
 }
 
 CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) const{
@@ -180,17 +213,25 @@ CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) con
 }
 
 CMapRouter::TLocation CMapRouter::GetNodeLocationByID(TNodeID nodeid) const{
-    // Your code HERE
-    int index = position.at(nodeid);
-    return nodes[index].location;
+    // Your code HERE 
+    auto lookup = position.find(nodeid);
+    int index = lookup->second;
+    TLocation locate;
+    locate.first = nodes[index].location.first;
+    locate.second = nodes[index].location.second;
+    return locate;
 }
 
 CMapRouter::TNodeID CMapRouter::GetNodeIDByStopID(TStopID stopid) const{
     // Your code HERE
+    TnodeIndex lookup = StopIDToNodeIndex.find(stopid)->second;
+    return nodes[lookup].nodeid;
 }
 
 size_t CMapRouter::RouteCount() const{
     // Your code HERE
+        return Routes.size();
+
 }
 
 std::string CMapRouter::GetSortedRouteNameByIndex(size_t index) const{
@@ -199,6 +240,19 @@ std::string CMapRouter::GetSortedRouteNameByIndex(size_t index) const{
 
 bool CMapRouter::GetRouteStopsByRouteName(const std::string &route, std::vector< TStopID > &stops){
     // Your code HERE
+    for(auto c:Routes){
+        if(c.name == route){
+            for(auto a:c.stops){
+                TStopID StopID = NodeIdToStopID.find(a)->second;
+                stops.push_back(StopID);
+
+            }
+        }
+    }
+    if(stops.empty()){
+        return false;
+    }
+    return true;
 }
 
 double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNodeID > &path){

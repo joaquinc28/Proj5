@@ -4,8 +4,10 @@
 #include <vector>
 #include <istream>
 #include <unordered_map>
+#include <map>
 #include "XMLEntity.h"
 #include "XMLReader.h"
+#include "CSVReader.h"
 class CMapRouter{
     public:
         using TNodeID = unsigned long;
@@ -22,16 +24,41 @@ class CMapRouter{
                 bool oneway;
                 int speed;
                 int distance;
+		double time;
+		bool busedge = false;
 	};
 	struct node{
 	       TNodeID  nodeid;
                TLocation location;
                std::vector<edge>edges;
 	};
+	struct BusRoutes{
+        std::string name;
+        std::vector<TnodeIndex>stops;
+        };
+        struct BusEdge{
+        std::vector<std::string>Routes;
+        double time;
+        std::vector<TnodeIndex>yee;
+	int distance;
+        //time
+        //vector path
+        //vector routenames
+
+        };
+
         std::vector<node>nodes;
 	std::unordered_map<TNodeID, int> position;
         std::vector<unsigned long>SortedIds;
-        
+        std::vector<BusRoutes>Routes;
+        std::map<unsigned long,TnodeIndex>StopIDToNodeIndex;
+        std::map<TnodeIndex,unsigned long>NodeIdToStopID;
+
+        std::vector<std::string>BusRouteNames;
+
+        std::map<std::string,BusRoutes>map;
+
+
     public:
         
         // Constructor of the CMapRouter

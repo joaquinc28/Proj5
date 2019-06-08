@@ -2,7 +2,7 @@
 #include "MapRouter.h"
 #include <sstream>
 #include "XMLReader.h"
-
+#include "CSVReader.h"
 const char OSMFileData [] = "<?xml version='1.0' encoding='UTF-8'?>\n"
                             "<osm version=\"0.6\" generator=\"osmconvert 0.8.5\">\n"
                             "    <node id=\"1\" lat=\"0\" lon=\"0\"/>\n"
