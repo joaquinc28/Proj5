@@ -153,21 +153,24 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
             NodeIndex = index;
         }
     }
-printf ("This line is %d.\n", __LINE__);
+    int i = 0;
     while(!readstops.End()){
-	    printf ("This line is %d.\n", __LINE__);
         std::vector<std::string>stops;
         readstops.ReadRow(stops);
 	auto lookup = position.find(std::stoul((stops[1])));
         TnodeIndex PlaceInVector = lookup->second;
-	printf ("This line is %d.\n", __LINE__);
 	unsigned long stopid = std::stoul(stops[0]);
         StopIDToNodeIndex[stopid] = PlaceInVector;
-	printf ("This line is %d.\n", __LINE__);
         NodeIdToStopID[PlaceInVector] = stopid;
-	printf ("This line is %d.\n", __LINE__);
-
+        i++;
     }
+    std::vector<std::string>sto;
+    readstops.ReadRow(sto);
+    std::cout<<i<<std::endl;
+for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeIdToStopID.end(); ++it)
+    std::cout << it->first << " => " << it->second << '\n';
+
+    std::cout<<NodeIdToStopID.size()<<std::endl;
 
     CCSVReader readroutes(routes);
     std::vector<std::string>Header;
@@ -192,6 +195,7 @@ printf ("This line is %d.\n", __LINE__);
         prev = route[0];
 
     }
+    std::cout<<Routes[0].stops.size()<<std::endl;
 
 return true;
 }

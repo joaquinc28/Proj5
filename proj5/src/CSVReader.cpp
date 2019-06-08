@@ -50,7 +50,7 @@ void CCSVReader::callbackfield(void *str, size_t len, void *data){
 }
 void CCSVReader::callbackrow(int ch, void *data){
        CCSVReader *ptr2 = static_cast<CCSVReader*>(data);
-       if (ch == '\n' or ch == '\r'){
+       if (ch == '\n' or ch == '\r' or ch == EOF){
            ptr2->bufferedrows.push(ptr2->rowbuffer);
            ptr2-> rowbuffer.clear();
 	   
