@@ -3,7 +3,9 @@
 
 #include <vector>
 #include <istream>
-
+#include <unordered_map>
+#include "XMLEntity.h"
+#include "XMLReader.h"
 class CMapRouter{
     public:
         using TNodeID = unsigned long;
@@ -13,18 +15,34 @@ class CMapRouter{
 
         static const TNodeID InvalidNodeID;
     private:
-
-        struct Node {
-            long nodeID;
-            double lat, lon;
-
+        using TnodeIndex = int;
+        struct edge {
+            TnodeIndex ConnectedNode;
+            TLocation location;
+            bool oneway;
+            bool IsBusEdge;
+            double speed;
+            double distance;
         };
-
-        struct Way {
-            
-
+        struct node {
+            TNodeID  nodeid;
+            TLocation location;
+            std::vector<edge>edges;
         };
+        struct Route {
+            std::string Name;
+            std::vector<TnodeIndex> StopIndices
+        }
 
+        std::vector<node>nodes;
+        std::unordered_map<TNodeID, int> position;
+        std::vector<unsigned long>SortedIds;
+
+        std::map<TStopID, TnodeIndex> StopToNodeTranslation;
+        std::map<TnodeIndex, TStopID> NodeToStopTranslation;
+
+        std::vector<std::string> SortedRouteNames;
+        std::map<std::string, Route> RouteTranslations;
 
     public:
 
