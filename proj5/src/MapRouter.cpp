@@ -181,14 +181,14 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                                                           nodes[wayorder[i + 1]].location.first,
                                                           nodes[wayorder[i + 1]].location.second);
                     tempedge.distance = distance;
-		    tempedge.time = distance / 3;
+		    tempedge.time = distance / 3.00;
                     nodes[wayorder[i]].edges.push_back(tempedge);
                     if(!oneway) {
                         edge edge2;
                         edge2.ConnectedNode = wayorder[i];
                         edge2.speed = speed_limit;
                         edge2.distance = distance;
-			edge2.time = distance / 3;
+			edge2.time = distance / 3.00;
                         nodes[wayorder[i + 1]].edges.push_back(edge2);
 
                     }
@@ -302,7 +302,7 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
         	TnodeIndex dest = p.first.second;
         	edge busedge;
         	busedge.distance = p.second.distance;
-        	busedge.time = p.second.time;
+        	busedge.time = p.second.time + 30.00/3600.00;
         	busedge.busedge = true;
         	busedge.ConnectedNode = dest;
         	nodes[source].edges.push_back(busedge);
@@ -382,7 +382,12 @@ double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNod
 }
 
 double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPathStep > &path){
-    // Your code HERE
+	        auto lookup = position.find(src);
+    auto NewSrc = lookup->second;
+    auto lookup2 = position.find(dest);
+    auto NewDest = lookup2->second;
+    std::vector< TNodeID > path1;
+    return dkystra(NewSrc,NewDest,path1,1);
 }
 
 bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::vector< std::string > &desc) const{
