@@ -171,20 +171,18 @@ size_t CMapRouter::NodeCount() const{
 
 CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
     // Your code HERE
+    return nodes[index].nodeid;
 }
 
 CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) const{
     // Your code HERE
+    return nodes[index].location;
 }
 
 CMapRouter::TLocation CMapRouter::GetNodeLocationByID(TNodeID nodeid) const{
     // Your code HERE
-        auto lookup = position.find(nodeid);
-    int index = lookup->second;
-    TLocation locate;
-    locate.first = nodes[index].location.first;
-    locate.second = nodes[index].location.second;
-    return locate;
+    int index = position.at(nodeid);
+    return nodes[index].location;
 }
 
 CMapRouter::TNodeID CMapRouter::GetNodeIDByStopID(TStopID stopid) const{
