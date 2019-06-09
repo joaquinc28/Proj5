@@ -496,14 +496,32 @@ std::string find_direction(double bearing){
 }
 
 std::string helper(double lat, double lon,int type,const std::string dir){
-    double latmin = (lat - floor(lat)) * 60;
-    double latsec = (latmin - floor(latmin)) * 60;
-    latmin = floor(latmin);
+    auto latmin = (lat - floor(lat)) * 60;
+    auto latsec = (latmin - floor(latmin)) * 60;
+    std::string str;
+    if(latsec == 0){
+	latsec = int(latsec);
+	str = std::to_string(latsec);
+    }
+    else{
+	std::cout.precision(4);
+        //str = std::cout<<latsec<<std::endl;
+    }
+    int latmin2 = int(floor(latmin));
     auto latdeg = int(abs((lat)));
 
     double longmin = (lon - floor(lon)) * 60;
     double longsec = (longmin - floor(longmin)) * 60;
-    longmin = floor(longmin);
+    std::string str2;
+    if(latsec == 0){
+	latsec = int(latsec);
+        str2 = std::to_string(latsec);
+    }
+    else{
+	std::cout.precision(4);
+        //str2 = std::cout<<longsec<<std::endl
+    }
+    int longmin2 = int(floor(longmin));
     auto longdeg = int(abs((lon)));
 
     char latdir = (lat >= 0) ? 'N' : 'S';
@@ -511,19 +529,19 @@ std::string helper(double lat, double lon,int type,const std::string dir){
     std::string ret;
     if(type == 0) {
 
-        ret = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
-              + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
-              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+        ret = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin2)
+              + "' " + str + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin2) + "' " + str2 + "\" " + longdir;
     }
     if(type == 1){
-        ret = "Walk " + dir + " to " + std::to_string(latdeg) + "d " + std::to_string(latmin)
-                + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
-              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+        ret = "Walk " + dir + " to " + std::to_string(latdeg) + "d " + std::to_string(latmin2)
+                + "' " + str + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin2) + "' " + str2 + "\" " + longdir;
     }
     if(type == 2){
-        ret = "End at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
-                + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
-              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+        ret = "End at " + std::to_string(latdeg) + "d " + std::to_string(latmin2)
+                + "' " + str + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin2) + "' " + str2 + "\" " + longdir;
     }
     return ret;
 }
@@ -543,22 +561,22 @@ bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::v
 
             double latmin = (locate.first - floor(locate.first)) * 60;
             double latsec = (latmin - floor(latmin)) * 60;
-            latmin = floor(latmin);
+            int latmin2 = int(floor(latmin));
             auto latdeg = int(abs((locate.first)));
                    printf ("This line is %d.\n", __LINE__);
 
             double longmin = (locate.second - floor(locate.second)) * 60;
             double longsec = (longmin - floor(longmin)) * 60;
-            longmin = floor(longmin);
+            int longmin2 = int(floor(longmin));
             auto longdeg = int(abs((locate.first)));
 
             char latdir = (locate.first >= 0) ? 'N' : 'S';
             char longdir = (locate.second >= 0) ? 'E' : 'W';
                    printf ("This line is %d.\n", __LINE__);
 
-            std::string start = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
+            std::string start = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin2)
                     + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
-                                "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+                                "d " + std::to_string(longmin2) + "' " + std::to_string(longsec) + "\" " + longdir;
             desc.push_back(start);
             if(path[1].first == "Walk"){
                 auto find = position.find(path[1].second)->second;
