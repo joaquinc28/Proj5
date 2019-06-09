@@ -528,28 +528,16 @@ std::string helper(double lat, double lon,int type,const std::string dir){
     auto latmin = (lat - floor(lat)) * 60;
     auto latsec = (latmin - floor(latmin)) * 60;
     std::string str;
-    if(latsec == 0){
-	latsec = int(latsec);
-	str = std::to_string(latsec);
-    }
-    else{
-	std::cout.precision(4);
-        //str = std::cout<<latsec<<std::endl;
-    }
+	int latsec2 = int(latsec);
+	str = std::to_string(latsec2);
     int latmin2 = int(floor(latmin));
     auto latdeg = int(abs((lat)));
 
     double longmin = (lon - floor(lon)) * 60;
     double longsec = (longmin - floor(longmin)) * 60;
     std::string str2;
-    if(latsec == 0){
-	latsec = int(latsec);
-        str2 = std::to_string(latsec);
-    }
-    else{
-	std::cout.precision(4);
-        //str2 = std::cout<<longsec<<std::endl
-    }
+	int longsec2 = int(longsec);
+        str2 = std::to_string(longsec2);
     int longmin2 = int(floor(longmin));
     auto longdeg = int(abs((lon)));
 
@@ -578,34 +566,31 @@ std::string helper(double lat, double lon,int type,const std::string dir){
 
 bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::vector< std::string > &desc) const{
     // Your code HERE
-           printf ("This line is %d.\n", __LINE__);
-
+    if(path.empty())
+	    return false;
     for(int i = 0;i < path.size() - 1;i++){
-	           printf ("This line is %d.\n", __LINE__);
-
         if (i == 0){
             auto loca = position.find(path[0].second)->second;
             TLocation locate = nodes[loca].location;
-                   printf ("This line is %d.\n", __LINE__);
 
             double latmin = (locate.first - floor(locate.first)) * 60;
             double latsec = (latmin - floor(latmin)) * 60;
+	    int latsec2 = int(latsec);
             int latmin2 = int(floor(latmin));
             auto latdeg = int(abs((locate.first)));
-                   printf ("This line is %d.\n", __LINE__);
 
             double longmin = (locate.second - floor(locate.second)) * 60;
             double longsec = (longmin - floor(longmin)) * 60;
+	    int longsec2 = int(longsec);
             int longmin2 = int(floor(longmin));
             auto longdeg = int(abs((locate.first)));
 
             char latdir = (locate.first >= 0) ? 'N' : 'S';
             char longdir = (locate.second >= 0) ? 'E' : 'W';
-                   printf ("This line is %d.\n", __LINE__);
 
             std::string start = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin2)
-                    + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
-                                "d " + std::to_string(longmin2) + "' " + std::to_string(longsec) + "\" " + longdir;
+                    + "' " + std::to_string(latsec2) + "\" " + latdir + ", " + std::to_string(longdeg) +
+                                "d " + std::to_string(longmin2) + "' " + std::to_string(longsec2) + "\" " + longdir;
             desc.push_back(start);
             if(path[1].first == "Walk"){
                 auto find = position.find(path[1].second)->second;
@@ -618,25 +603,20 @@ bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::v
         }
         else if (path[i].first != "Walk"){
             if(path[i + 1].first == "Walk"){
-		                       printf ("This line is %d.\n", __LINE__);
 
                 TnodeIndex node = position.find(path[i].second)->second;
                 TStopID stop = NodeIdToStopID.find(node)->second;
                 std::string str;
                 str = "Take " + path[i].first + " and get off at stop " + std::to_string(stop);
                 desc.push_back(str);
-                   printf ("This line is %d.\n", __LINE__);
 
                 auto firs = position.find(path[i].second)->second;
                 auto secon = position.find(path[i + 1].second)->second;
                 TLocation first = nodes[firs].location;
                 TLocation second = nodes[secon].location;
-		                   printf ("This line is %d.\n", __LINE__);
-
                 double bearing = CalculateBearing(first.first,first.second,second.first,second.second);
                 std::string direction = find_direction(bearing);
                 desc.push_back(helper(second.first,second.second,1,direction));
-		                   printf ("This line is %d.\n", __LINE__);
 
             }
 
