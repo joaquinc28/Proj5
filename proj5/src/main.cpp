@@ -3,6 +3,7 @@
 #include "XMLReader.h"
 #include "XMLWriter.h"
 #include "StringUtils.h"
+#include "MapRouter.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
