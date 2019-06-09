@@ -124,4 +124,5 @@ print    Prints the steps for the last calculated path
         }
 
     }
+	return 0;
 }
