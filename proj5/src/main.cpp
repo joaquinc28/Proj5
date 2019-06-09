@@ -96,7 +96,7 @@ print    Prints the steps for the last calculated path
             CMapRouter::TNodeID dest = 0;
             d >> dest;
 
-			std::vector<TnodeID> shortestpath;
+			//std::vector<TnodeID> shortestpath;
 
             double shortest = 0;
             shortest = MapRouter.FindShortestPath(src, dest, &shortestpath);
@@ -113,6 +113,9 @@ print    Prints the steps for the last calculated path
         else if (input[0] == "print") {
             std::vector< std::string > desc;
             MapRouter.GetPathDescription(&path, &desc);
+			for (int i = 0; i < desc.size() - 1; i++) {
+				std::cout << desc[i] << std::endl;
+			}
 
 
 
