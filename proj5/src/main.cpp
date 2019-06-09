@@ -3,6 +3,7 @@
 #include "XMLReader.h"
 #include "XMLWriter.h"
 #include "StringUtils.h"
+#include "MapRouter.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -15,7 +16,8 @@
 
 int main(int argc, char* argv[]) {
 	for(int i = 0; i < argc; i++) {
-
+	}
+	std::cout << argv[0] << "yee" << std::endl;
     //parse cmd line args
     //input file stream for data
 
