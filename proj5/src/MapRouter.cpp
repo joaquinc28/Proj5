@@ -111,17 +111,13 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
     }
     while(!reader.End()){
 	    reader.ReadEntity(TempEnt);
-	    printf("Not logical value at line number %d \n",__LINE__);
 	if(TempEnt.DType == SXMLEntity::EType::EndElement){
 	    if(TempEnt.DNameData == "osm"){
-		    printf("Not logical value at line number %d \n",__LINE__);
 	         break;
 	    }
 	}	    
         if(TempEnt.DType == SXMLEntity::EType::StartElement){
-		printf("Not logical value at line number %d \n",__LINE__);
             if(TempEnt.DNameData == "node"){
-		    printf("Not logical value at line number %d \n",__LINE__);
                 TNodeID  TempId = std::stoul(TempEnt.AttributeValue("id"));
                 double TempLat = std::stoul(TempEnt.AttributeValue("lat"));
                 double TempLon = std::stoul(TempEnt.AttributeValue("lon"));
@@ -140,7 +136,6 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                 int speed_limit = 25;
                 std::vector<TnodeIndex> wayorder;
                 while(!reader.End()){
-			printf("Not logical value at line number %d \n",__LINE__);
                     reader.ReadEntity(TempEnt);
                     if(TempEnt.DType == SXMLEntity::EType::EndElement){
                         if(TempEnt.DNameData == "way"){
@@ -475,13 +470,151 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
 	}
 
          }
-
-for(auto &c:path){
-        std::cout<<c.first<<" "<<c.second<<std::endl;
-    }
     return distance[NewDest];
 }
+std::string find_direction(double bearing){
+
+    std::string direction;
+    if(bearing >= -180 and bearing < -135)
+        direction = "S";
+    else if(bearing >= -135 and bearing < -90)
+        direction = "SW";
+    else if(bearing >= -90 and bearing < -45)
+        direction = "W";
+    else if(bearing >= -45 and bearing < 0)
+        direction = "NW";
+    else if(bearing >= 0 and bearing < 45)
+        direction = "N";
+    else if(bearing >= 45 and bearing < 90)
+        direction = "NE";
+    else if(bearing >= 90 and bearing < 135)
+        direction = "E";
+    else if(bearing >= 135 and bearing <= 180)
+        direction = "SE";
+
+    return direction;
+}
+
+std::string helper(double lat, double lon,int type,const std::string dir){
+    double latmin = (lat - floor(lat)) * 60;
+    double latsec = (latmin - floor(latmin)) * 60;
+    latmin = floor(latmin);
+    auto latdeg = int(abs((lat)));
+
+    double longmin = (lon - floor(lon)) * 60;
+    double longsec = (longmin - floor(longmin)) * 60;
+    longmin = floor(longmin);
+    auto longdeg = int(abs((lon)));
+
+    char latdir = (lat >= 0) ? 'N' : 'S';
+    char longdir = (lon >= 0) ? 'E' : 'W';
+    std::string ret;
+    if(type == 0) {
+
+        ret = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
+              + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+    }
+    if(type == 1){
+        ret = "Walk " + dir + " to " + std::to_string(latdeg) + "d " + std::to_string(latmin)
+                + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+    }
+    if(type == 2){
+        ret = "End at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
+                + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
+              "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+    }
+    return ret;
+}
+
 
 bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::vector< std::string > &desc) const{
     // Your code HERE
+           printf ("This line is %d.\n", __LINE__);
+
+    for(int i = 0;i < path.size() - 1;i++){
+	           printf ("This line is %d.\n", __LINE__);
+
+        if (i == 0){
+            auto loca = position.find(path[0].second)->second;
+            TLocation locate = nodes[loca].location;
+                   printf ("This line is %d.\n", __LINE__);
+
+            double latmin = (locate.first - floor(locate.first)) * 60;
+            double latsec = (latmin - floor(latmin)) * 60;
+            latmin = floor(latmin);
+            auto latdeg = int(abs((locate.first)));
+                   printf ("This line is %d.\n", __LINE__);
+
+            double longmin = (locate.second - floor(locate.second)) * 60;
+            double longsec = (longmin - floor(longmin)) * 60;
+            longmin = floor(longmin);
+            auto longdeg = int(abs((locate.first)));
+
+            char latdir = (locate.first >= 0) ? 'N' : 'S';
+            char longdir = (locate.second >= 0) ? 'E' : 'W';
+                   printf ("This line is %d.\n", __LINE__);
+
+            std::string start = "Start at " + std::to_string(latdeg) + "d " + std::to_string(latmin)
+                    + "' " + std::to_string(latsec) + "\" " + latdir + ", " + std::to_string(longdeg) +
+                                "d " + std::to_string(longmin) + "' " + std::to_string(longsec) + "\" " + longdir;
+            desc.push_back(start);
+            if(path[1].first == "Walk"){
+                auto find = position.find(path[1].second)->second;
+                TLocation coord = nodes[find].location;
+                double bear = CalculateBearing(locate.first,locate.second,coord.first,coord.second);
+                std::string bear1 = find_direction(bear);
+                desc.push_back(helper(coord.first,coord.second,1,bear1));
+            }
+
+        }
+        else if (path[i].first != "Walk"){
+            if(path[i + 1].first == "Walk"){
+		                       printf ("This line is %d.\n", __LINE__);
+
+                TnodeIndex node = position.find(path[i].second)->second;
+                TStopID stop = NodeIdToStopID.find(node)->second;
+                std::string str;
+                str = "Take " + path[i].first + " and get off at stop " + std::to_string(stop);
+                desc.push_back(str);
+                   printf ("This line is %d.\n", __LINE__);
+
+                auto firs = position.find(path[i].second)->second;
+                auto secon = position.find(path[i + 1].second)->second;
+                TLocation first = nodes[firs].location;
+                TLocation second = nodes[secon].location;
+		                   printf ("This line is %d.\n", __LINE__);
+
+                double bearing = CalculateBearing(first.first,first.second,second.first,second.second);
+                std::string direction = find_direction(bearing);
+                desc.push_back(helper(second.first,second.second,1,direction));
+		                   printf ("This line is %d.\n", __LINE__);
+
+            }
+
+        }
+        else if(path[i].first == "Walk"){
+            if(path[i + 1].first == "Walk"){
+                TnodeIndex pos = position.find(path[i].second)->second;
+                TLocation first = nodes[pos].location;
+                TnodeIndex pos2 = position.find(path[i + 1].second)->second;
+                TLocation sec = nodes[pos2].location;
+
+                double bearing = CalculateBearing(first.first,first.second,sec.first,sec.second);
+                std::string direct = find_direction(bearing);
+
+                desc.push_back(helper(sec.first,sec.second,1,direct));
+            }
+        }
+    }
+    TnodeIndex pos = position.find(path[path.size()-1].second)->second;
+    TLocation last = nodes[pos].location;
+    std::string directi;
+    desc.push_back(helper(last.first,last.second,2,directi));
+    for(int j = 0;j<desc.size();j++){
+        std::cout<<desc[j]<<std::endl;
+    }
+    return true;
 }
+
