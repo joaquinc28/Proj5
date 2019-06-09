@@ -244,10 +244,20 @@ double CMapRouter::Dijkstra(TnodeIndex src, TnodeIndex dest, std::vector<TnodeIn
 }
 
 double CMapRouter::FindShortestPath(TNodeID src, TNodeID dest, std::vector< TNodeID > &path){
+    auto srcIdx = position[src];
+    auto destIdx = position[dest];
+    std::vector<TnodeID> path;
+    double distance = Dijkstra(sourceIdx, destIdx, path, 0);
+    
+    return distance;
     // Your code HERE
 }
 
 double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPathStep > &path){
+    auto srcIdx = position[src];
+    auto destIdx = position[dest];
+    std::vector<TnodeID> path;
+    double distance = Dijkstra(sourceIdx, destIdx, path, searchtype);
     // Your code HERE
 }
 
