@@ -386,7 +386,6 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
     auto NewSrc = lookup->second;
     auto lookup2 = position.find(dest);
     auto NewDest = lookup2->second;
-    std::vector< TNodeID > path1;
      std::vector<TnodeIndex > prev(nodes.size());
     std::vector<double>distance(nodes.size(),std::numeric_limits<double>::max());
     std::vector<TNodeID > heap;
@@ -413,7 +412,73 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
         }
 
     }
+    if(distance[dest] == std::numeric_limits<double>::max()){
+       return false;
+}
+   auto temp = NewDest;
+   std::vector<TnodeIndex>path1;
+    while(temp != NewSrc){
+        path1.push_back(temp);
+        temp = prev[temp];
+    }
+   path1.push_back(NewSrc);
+   std::reverse(path1.begin(),path1.end());
+   int i;
+   int count;
+   for(i = 0;i < path1.size() - 1;i++){
+        auto edges = busedge(path1[i],path1[i+1]);
+        if(NodeIDsToBusEdge.find(edges) == NodeIDsToBusEdge.end()){
+            TPathStep temppath;
+            temppath.first = "Walk";
+            temppath.second = NodeIdToIndex.find(path1[i])->second;
+            path.push_back(temppath);
 
+        }
+        else{
+	    TPathStep temp;
+            temp.first = "Walk";
+            temp.second = NodeIdToIndex.find(NodeIDsToBusEdge[edges].path[0])->second;
+            path.push_back(temp);
+            for(int j = 1;j<NodeIDsToBusEdge[edges].path.size();j++){
+                TPathStep temppath;
+		std::string route = NodeIDsToBusEdge[edges].Routes[0];
+                temppath.first = "Bus " + NodeIDsToBusEdge[edges].Routes[0];
+                temppath.second = NodeIdToIndex.find(NodeIDsToBusEdge[edges].path[j])->second;
+                path.push_back(temppath);
+		int k = i + 1;
+		count = 0;
+		    printf ("This line is %d.\n", __LINE__);
+
+		for(k;k<path1.size()-1;k++){
+			    printf ("This line is %d.\n", __LINE__);
+
+                    auto MoreEdges = busedge(path1[k],path1[k+1]);
+                    auto find = NodeIDsToBusEdge.find(MoreEdges);
+		        printf ("This line is %d.\n", __LINE__);
+
+                    if(find != NodeIDsToBusEdge.end() and find->second.Routes[0] ==route){
+                        count++;
+			    printf ("This line is %d.\n", __LINE__);
+
+                        for(int k2 = 1;k2<NodeIDsToBusEdge[MoreEdges].path.size();k2++) {
+			    TPathStep MorePath;	
+                            MorePath.first = "Bus " + route;
+                            MorePath.second = NodeIdToIndex.find(NodeIDsToBusEdge[MoreEdges].path[k2])->second;
+                            path.push_back(MorePath);
+                        }
+
+                    }
+
+                }
+            }
+	    i += count;
+        }
+
+    }
+
+for(auto &c:path){
+        std::cout<<c.first<<" "<<c.second<<std::endl;
+    }
     return distance[NewDest];
 }
 
