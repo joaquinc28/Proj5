@@ -248,11 +248,16 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
             TnodeIndex Stopidindex = StopIDToNodeIndex.find(std::stoul(route[1]))->second;
             ARoute.stops.push_back(Stopidindex);
             Routes.push_back(ARoute);
+            BusRouteNames.push_back(route[0]);
+
         }
 
         prev = route[0];
 
     }
+
+    std::sort(BusRouteNames.begin(),BusRouteNames.end());
+
     std::cout<<Routes[0].stops.size()<<std::endl;
     for(auto c:Routes[0].stops){
         std::cout<<c<<std::endl;
@@ -320,7 +325,25 @@ CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
 
 CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) const{
     // Your code HERE
-    return nodes[index].location;
+               printf ("This line is %d.\n", __LINE__);
+
+    TLocation emtpy = std::make_pair(180.00,360.00);
+               printf ("This line is %d.\n", __LINE__);
+
+    TNodeID id = SortedIds[index];
+               printf ("This line is %d.\n", __LINE__);
+
+    auto find = position.find(id);
+               printf ("This line is %d.\n", __LINE__);
+    
+    if(find == position.end()){
+        std::cout<<"why"<<std::endl;
+        return emtpy;
+    }
+
+    TnodeIndex ind = position.find(id)->second;
+               printf ("This line is %d.\n", __LINE__);
+    return nodes[ind].location;
 }
 
 CMapRouter::TLocation CMapRouter::GetNodeLocationByID(TNodeID nodeid) const{
@@ -347,6 +370,12 @@ size_t CMapRouter::RouteCount() const{
 
 std::string CMapRouter::GetSortedRouteNameByIndex(size_t index) const{
     // Your code HERE
+    if(index >= BusRouteNames.size()){
+	    return "";
+    }
+    return BusRouteNames[index];
+
+
 }
 
 bool CMapRouter::GetRouteStopsByRouteName(const std::string &route, std::vector< TStopID > &stops){
