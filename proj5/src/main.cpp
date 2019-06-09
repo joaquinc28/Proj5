@@ -2,7 +2,9 @@
 #include "CSVWriter.h"
 #include "XMLReader.h"
 #include "XMLWriter.h"
+#include "StringUtils.h"
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <utility>
 #include <string>
@@ -11,122 +13,110 @@
 #include <cctype>
 
 
-int main(int argc, char* argv[]){
-	for(int i = 0; i < argc;i++){
-        std::ifstream fp(argv[i]);
-        std::string str(argv[i]);
+int main(int argc, char* argv[]) {
+	for(int i = 0; i < argc; i++) {
 
-        size_t found = str.find_last_of('.');
-        std::string ext = str.substr(found + 1);
+    //parse cmd line args
+    //input file stream for data
 
+    //load in maps and routes
+    CMapRouter MapRouter();
 
-        if(ext == "csv"){
-            size_t find = str.find_first_of('_');
-            std::string subject = str.substr(0,find);
-            std::string str1 = str.substr(find + 1);
-            size_t find1 = str1.find_first_of('_');
-            std::string course = str1.substr(0,find1);
-            std::string str2 = str1.substr(find1 + 1);
-            size_t find2 = str2.find_last_of('.');
-            std::string section = str2.substr(0,find2);
+    std::string DataPath = "data/";
 
-            std::string filena = subject + "_" + course + "_" + section + ".xml";
+    std::ifstream osm(DataPath + "davis.osm");
+    std::ifstream stops(DataPath + "stops.csv");
+    std::ifstream routes(DataPath + "routes.csv");
 
+    MapRouter.LoadMapAndRoutes;
 
-            CCSVReader read(fp);
-            std::ofstream file;
-            file.open(filena);
-            
-            std::vector<std::string>header;
-            read.ReadRow(header);
-            for(int i = 0;i<header.size();i++){
-                std::cout<<header[i]<<std::endl;
-            }
-            SXMLEntity head;
-            head.DNameData = "course";
-            head.DType = SXMLEntity::EType::StartElement;
-            head.SetAttribute("SUBJ", subject);
-            head.SetAttribute("CRSE", course);
-            head.SetAttribute("SEC", section);
+    std::cout << ">";
+    std::string input;
+    //std::cin << input;
+    std::vector<TPathStep> path;
 
-            CXMLWriter write(file);
-            write.WriteEntity(head);
-            file<<"\n";
-	    while(!read.End()){
-		std::cout<<"im in"<<std::endl;
-                std::vector<std::string>row;
-                SXMLEntity e;
-                e.DNameData = "Student";
-                e.DType = SXMLEntity::EType::CompleteElement;
-		read.ReadRow(row);
-		for(int i = 0;i<header.size();i++){
-                       std::cout<<row[i]<<std::endl;
-            }
+    while (input != "exit") {
+        //parse typed commands
+        std::getline(std::cin, input);
+        std::vector<std::string> input = split(input, " ");
 
-                for (int i = 0; i < header.size(); i++) {
-                      e.SetAttribute(header[i], row[i]);
-		}
-               file<<"   ";
-               write.WriteEntity(e);
-	       file<<"\n";
-            }
-            file<<"</course>"<<std::endl;
+        if (input[0] == "help" ){
+            std::cout << "findroute [--data=path | --resutls=path]
+------------------------------------------------------------------------
+help     Display this help menu
+exit     Exit the program
+count    Output the number of nodes in the map
+node     Syntax \"node [0, count)\"
+         Will output node ID and Lat/Lon for node
+fastest  Syntax \"fastest start end\"
+         Calculates the time for fastest path from start to end
+shortest Syntax \"shortest start end\"
+         Calculates the distance for the shortest path from start to end
+save     Saves the last calculated path to file
+print    Prints the steps for the last calculated path
+" << std::endl;
+        }
+
+        else if (input[0] == "count") {
+            std::cout << MapRouter.NodeCount();
+        }
+
+        else if (input[0] == "node") {
+            stringstream i(input[1]);
+            int index = 0;
+            i >> index;
+            CMapRouter::TnodeIndex node = nodes[index];
+            CMapRouter::TNodeID nodeID = node.nodeid;
+            CMapRouter::TLocation Location (node.location.first, node.locaton.second);
+
+            std::cout << "Node " << index << ":" << "id = " << nodeID << " is at "
+            << Location.first << ", " << Location.second << std::endl;
 
         }
-	
-	if(ext == "xml"){
-            CXMLReader read(fp);
-            SXMLEntity courseinfo;
-            read.ReadEntity(courseinfo,true);
+        else if (input[0] == "fastest"){
+            stringstream s(input[1]);
+            CMapRouter::TNodeID src = 0;
+            s >> src;
 
-            std::string subj = courseinfo.AttributeValue("SUBJ");
-            std::string course = courseinfo.AttributeValue("CRSE");
-            std::string sec = courseinfo.AttributeValue("SEC");
+            stringstream d(input[2]);
+            CMapRouter::TNodeID dest = 0;
+            d >> dest;
 
-            std::string filename;
-            filename = subj + "_" + course + "_" + sec + ".csv";
+            double fastest = 0;
+            fastest = MapRouter.FindFastestPath(src, dest, &path);
+            std::cout << "Fastest path takes " << fastest << std::endl;
 
-            std::ofstream myfile;
+        }
+        else if (input[0] == "shortest") {
+            stringstream s(input[1]);
+            CMapRouter::TNodeID src = 0;
+            s >> src;
 
-            myfile.open(filename);
+            stringstream d(input[2]);
+            CMapRouter::TNodeID dest = 0;
+            d >> dest;
 
-            std::cout<<courseinfo.DNameData<<std::endl;
+			std::vector<TnodeID> shortestpath;
 
-            SXMLEntity student;
+            double shortest = 0;
+            shortest = MapRouter.FindShortestPath(src, dest, &shortestpath);
 
-            read.ReadEntity(student,true);
+			for (int i = 0; i < shortestpath.size() - 1; i++) {
+				MapRouter.
+			}
 
-	    std::cout<<student.DNameData<<std::endl;
+        }
+        else if (input[0] == "save") {
 
-            std::vector<std::string>h;
-	    std::vector<std::string>d;
-            for(auto c:student.DAttributes){
-		    printf(" %d \n",__LINE__);
-                h.push_back(std::get<0>(c));
-		d.push_back(std::get<1>(c));
-		std::cout<<std::get<0>(c)<<std::endl;
-                std::cout<<std::get<1>(c)<<std::endl;
 
-            }
-            CCSVWriter writer(myfile);
-	    writer.WriteRow(h);
-	    writer.WriteRow(d);
-	    
-	    
-            while(!read.End()){
-                SXMLEntity data;
-                std::vector<std::string>info;
-                read.ReadEntity(data,true);
-		
-                for(auto d: data.DAttributes){
-                    info.push_back(std::get<1>(d));
-                }
-		writer.WriteRow(info);
+        }
+        else if (input[0] == "print") {
+            std::vector< std::string > desc;
+            MapRouter.GetPathDescription(&path, &desc);
 
-            }
-	}
-	}
 
-return 0;
+
+        }
+
+    }
 }
-
