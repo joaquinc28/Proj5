@@ -15,7 +15,19 @@
 
 
 int main(int argc, char* argv[]) {
-	for(int i = 0; i < argc; i++) {
+	std::string ResultsPath;
+
+	for(int i = 1; i < argc; i++) {
+		std::string str(argv[i]);
+		std::vector<std::string> arg = StringUtils::split(arg, "/");
+		for (int j = 0; j < arg.size(); i++) {
+			if (arg[j] == "--results=") {
+				for (int k = 0; k < arg.size(); k++) {
+					ResultsPath = ResultsPath + arg[k];
+				}
+			}
+		}
+
 	}
 	std::cout << argv[0] << "yee" << std::endl;
     //parse cmd line args
@@ -30,46 +42,50 @@ int main(int argc, char* argv[]) {
     std::ifstream stops(DataPath + "stops.csv");
     std::ifstream routes(DataPath + "routes.csv");
 
-    MapRouter.LoadMapAndRoutes;
+    MapRouter().LoadMapAndRoutes;
 
     std::cout << ">";
     std::string input;
     //std::cin << input;
-    std::vector<TPathStep> path;
+    std::vector<CMapRouter::TPathStep> FastestPath;
+	std::vector<CMapRouter::TNodeID> ShortestPath;
+	int PathType = 0;
+	CMapRouter::TNodeID node1;
+	CMapRouter::TNodeID node2;
+	double DistTime;
+
+	std::getline(std::cin, input);
+	std::vector<std::string> input = StringUtils::split(input, " ");
 
     while (input != "exit") {
-        //parse typed commands
-        std::getline(std::cin, input);
-        std::vector<std::string> input = split(input, " ");
 
         if (input[0] == "help" ){
-            std::cout << "findroute [--data=path | --resutls=path]
-------------------------------------------------------------------------
-help     Display this help menu
-exit     Exit the program
-count    Output the number of nodes in the map
-node     Syntax \"node [0, count)\"
-         Will output node ID and Lat/Lon for node
-fastest  Syntax \"fastest start end\"
-         Calculates the time for fastest path from start to end
-shortest Syntax \"shortest start end\"
-         Calculates the distance for the shortest path from start to end
-save     Saves the last calculated path to file
-print    Prints the steps for the last calculated path
-" << std::endl;
+            std::cout << "findroute [--data=path | --resutls=path] \n"
+"------------------------------------------------------------------------\n"
+"help     Display this help menu\n"
+"exit     Exit the program\n"
+"count    Output the number of nodes in the map/\n"
+"node     Syntax \"node [0, count)\"\n"
+"         Will output node ID and Lat/Lon for node\n"
+"fastest  Syntax \"fastest start end\"\n"
+"         Calculates the time for fastest path from start to end\n"
+"shortest Syntax \"shortest start end\"\n"
+"         Calculates the distance for the shortest path from start to end\n"
+"save     Saves the last calculated path to file\n"
+"print    Prints the steps for the last calculated path\n"
+ << std::endl;
         }
 
         else if (input[0] == "count") {
-            std::cout << MapRouter.NodeCount();
+            std::cout << MapRouter().NodeCount();
         }
 
         else if (input[0] == "node") {
-            stringstream i(input[1]);
+            std::stringstream i(input[1]);
             int index = 0;
             i >> index;
-            CMapRouter::TnodeIndex node = nodes[index];
-            CMapRouter::TNodeID nodeID = node.nodeid;
-            CMapRouter::TLocation Location (node.location.first, node.locaton.second);
+			CMapRouter::TNodeID nodeID = MapRouter().GetSortedNodeIDByIndex(index);
+			CMapRouter::TLocation Location = MapRouter().GetSortedNodeLocationByIndex(index);
 
             std::cout << "Node " << index << ":" << "id = " << nodeID << " is at "
             << Location.first << ", " << Location.second << std::endl;
@@ -85,7 +101,9 @@ print    Prints the steps for the last calculated path
             d >> dest;
 
             double fastest = 0;
-            fastest = MapRouter.FindFastestPath(src, dest, &path);
+            fastest = MapRouter().FindFastestPath(src, dest, FastestPath);
+			DistTime = fastest;
+			PathType = 0;
             std::cout << "Fastest path takes " << fastest << std::endl;
 
         }
@@ -93,34 +111,63 @@ print    Prints the steps for the last calculated path
             stringstream s(input[1]);
             CMapRouter::TNodeID src = 0;
             s >> src;
+			node1 = src;
 
             stringstream d(input[2]);
             CMapRouter::TNodeID dest = 0;
             d >> dest;
-
-			//std::vector<TnodeID> shortestpath;
+			node2 = src;
 
             double shortest = 0;
-            shortest = MapRouter.FindShortestPath(src, dest, &shortestpath);
+            shortest = MapRouter().FindShortestPath(src, dest, ShortestPath);
+			DistTime = shortest;
+			PathType = 1
 
-			for (int i = 0; i < shortestpath.size() - 1; i++) {
-				MapRouter.
-			}
+
 
         }
         else if (input[0] == "save") {
+
+			//output should look like: "/home/juaco28/Proj5/62264034_95712808_0.833378hr.csv".
+			std::vector< std::string > desc;
+            desc = MapRouter().GetPathDescription(path, desc);
+
+			std::string filename;
+            filename = ResultsPath + "/" + node1 + "_" + node2 + "_" + DistTime ".csv";
+
+			std::ofstream myfile;
+			CCSVWriter writer(myfile);
+			std::vector<std::string> headers;
+			headers.push_back("mode");
+			headers.push_back("node_id");
+			writer.WriteRow(headers);
+
+			for (int i = 0; i < desc.size(); i++) {
+				writer.WriteRow(desc[i]);
+
+			}
+
 
 
         }
         else if (input[0] == "print") {
             std::vector< std::string > desc;
-            MapRouter.GetPathDescription(&path, &desc);
-			for (int i = 0; i < desc.size() - 1; i++) {
-				std::cout << desc[i] << std::endl;
+			if (PathType == 0) {
+            	MapRouter().GetPathDescription(FastestPath, desc);
+				for (int i = 0; i < desc.size(); i++) {
+					std::cout << desc[i] << std::endl;
+				}
 			}
+			else if (PathType == 1) {
+				MapRouter().GetPathShortest(ShortestPath, desc);
+				for (int i = 0; i < desc.size(); i++) {
+					std::cout << desc[i] << std::endl;
+				}
 
+			}
+			else{
 
-
+			}
         }
 
     }
