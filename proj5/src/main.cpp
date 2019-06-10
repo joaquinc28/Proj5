@@ -17,7 +17,7 @@
 int main(int argc, char* argv[]) {
 	std::string ResultsPath = "results/";
 
-	/*for(int i = 1; i < argc; i++) {
+	for(int i = 1; i < argc; i++) {
 		std::string str(argv[i]);
 		std::vector<std::string> arg = StringUtils::Split(str, "/");
 		for (int j = 0; j < arg.size(); i++) {
@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-	}*/
-	
+	}
+
     //parse cmd line args
     //input file stream for data
 
@@ -45,21 +45,54 @@ int main(int argc, char* argv[]) {
     MapRouter.LoadMapAndRoutes(osm, stops, routes);
 
     std::cout << ">";
-    std::string input2;
-    //std::cin << input;
-    std::vector<CMapRouter::TPathStep> FastestPath;
+
+	printf("Line %d\n", __LINE__);
+
+	std::string input2;
+
+	printf("Line %d\n", __LINE__);
+
+	std::vector<CMapRouter::TPathStep> FastestPath;
 	std::vector<CMapRouter::TNodeID> ShortestPath;
+
+	printf("Line %d\n", __LINE__);
+
 	int PathType = 0;
 	CMapRouter::TNodeID node1;
 	CMapRouter::TNodeID node2;
 	double DistTime;
 
+	printf("Line %d\n", __LINE__);
+
 	std::getline(std::cin, input2);
-	std::vector<std::string> input = StringUtils::Split(input2, " ");
+	std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
+	std::vector<std::string> input;
+	size_t start;
+	size_t end = 0;
+
+	while ((start = input2.find_first_not_of(" ", end)) != std::string::npos) {
+		end = input2.find(" ", start);
+		printf("Line %d\n", __LINE__);
+		input.push_back(input2.substr(start, end - start));
+		std::cout << "Line "<<__LINE__<<" " << input[0] << std::endl;
+		printf("Line %d\n", __LINE__);
+	}
+	printf("Line %d\n", __LINE__);
+
 
     while (input[0] != "exit") {
+		printf("Line %d\n", __LINE__);
+
+		//std::cout << input[0];
+
+		//input = StringUtils::Split(input2);
 
         if (input[0] == "help"){
+
+			input.clear();
+			for (int i = 0; i < input.size(); i++) {
+				std::cout << "Line "<<__LINE__<<" " << input[i] << std::endl;
+			}
             std::cout << "findroute [--data=path | --resutls=path] \n"
 "------------------------------------------------------------------------\n"
 "help     Display this help menu\n"
@@ -77,7 +110,7 @@ int main(int argc, char* argv[]) {
         }
 
         else if (input[0] == "count") {
-            std::cout << MapRouter.NodeCount();
+            std::cout << MapRouter.NodeCount() << std::endl;
         }
 
         else if (input[0] == "node") {
@@ -87,7 +120,7 @@ int main(int argc, char* argv[]) {
 			CMapRouter::TNodeID nodeID = MapRouter.GetSortedNodeIDByIndex(index);
 			CMapRouter::TLocation Location = MapRouter.GetSortedNodeLocationByIndex(index);
 
-            std::cout << "Node " << index << ":" << "id = " << nodeID << " is at "
+            std::cout << "Node " << index << ": " << "id = " << nodeID << " is at "
             << Location.first << ", " << Location.second << std::endl;
 
         }
@@ -122,6 +155,7 @@ int main(int argc, char* argv[]) {
             shortest = MapRouter.FindShortestPath(src, dest, ShortestPath);
 			DistTime = shortest;
 			PathType = 1;
+			std::cout << "Shortest path is " << shortest << " miles" << std::endl;
 
 
 
@@ -162,18 +196,34 @@ int main(int argc, char* argv[]) {
 					std::cout << desc[i] << std::endl;
 				}
 			}
-			else if (PathType == 1) {
+			else {
 				MapRouter.GetPathShortest(ShortestPath, desc);
 				for (int i = 0; i < desc.size(); i++) {
 					std::cout << desc[i] << std::endl;
 				}
 
 			}
-			else{
 
-			}
         }
+		std::cout << ">";
+		std::getline(std::cin, input2);
+		std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
 
+		input.clear();
+
+		//StringUtils::Split(input2);
+		printf("Line %d\n", __LINE__);
+
+		while ((start = input2.find_first_not_of(" ", end)) != std::string::npos) {
+			end = input2.find(" ", start);
+			input.push_back(input2.substr(start, end - start));
+			printf("Line %d\n", __LINE__);
+			std::cout << "Line "<<__LINE__<<" " << input2.substr(start, end - start) << std::endl;
+			printf("Line %d\n", __LINE__);
+			std::cout << "Line "<<__LINE__<<" " << input[0] << std::endl;
+			printf("Line %d\n", __LINE__);
+		}
+		printf("Line %d\n", __LINE__);
     }
 	return 0;
 }
