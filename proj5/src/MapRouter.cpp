@@ -135,7 +135,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
 
             else if(TempEnt.DNameData == "way"){
                 bool oneway = false;
-                int speed_limit = 25;
+                double speed_limit = 25;
                 std::vector<TnodeIndex> wayorder;
                 while(!reader.End()){
                     reader.ReadEntity(TempEnt);
@@ -163,7 +163,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
                             std::string speed = TempEnt.AttributeValue("v");
                             int npos = speed.find_first_of(" ");
                             std::string speed1 = speed.substr(0,npos);
-                            speed_limit = std::stoul(speed1);
+                            speed_limit = std::stod(speed1);
 
                         }
                     }
