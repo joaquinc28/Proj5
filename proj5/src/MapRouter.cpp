@@ -25,7 +25,7 @@ double CMapRouter::dkystra(CMapRouter::TnodeIndex src, CMapRouter::TnodeIndex de
     heap.push_back(src);
     while(!heap.empty()){
 	if(distance[dest] != std::numeric_limits<double>::max())
-		break;
+	break;
         std::make_heap(heap.begin(),heap.end(),compare);
         std::pop_heap(heap.begin(),heap.end(),compare);
         auto curr  = heap.back();
@@ -135,7 +135,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
 
             else if(TempEnt.DNameData == "way"){
                 bool oneway = false;
-                double speed_limit = 25;
+                double speed_limit = 25.00;
                 std::vector<TnodeIndex> wayorder;
                 while(!reader.End()){
                     reader.ReadEntity(TempEnt);
@@ -266,16 +266,10 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
             	TempBusedge.Routes.push_back(Routename);
             	TempBusedge.time = dkystra(Routes[i].stops[j], Routes[i].stops[j+1],path,2);
             	TempBusedge.distance = dkystra(Routes[i].stops[j], Routes[i].stops[j+1],path1,0);
-		for(int i = 0;i<path1.size();i++){
-                    std::cout<<path1[i]<<std::endl;
-                }
             	for(auto &c:path1){
                 	TnodeIndex nodeindex = position.find(c)->second;
                 	TempBusedge.path.push_back(nodeindex);
             	}	
-                for(int i = 0;i<TempBusedge.path.size();i++){
-                    std::cout<<TempBusedge.path[i]<<std::endl;
-                }		
 
             	NodeIDsToBusEdge[busIDS] = TempBusedge;
 
