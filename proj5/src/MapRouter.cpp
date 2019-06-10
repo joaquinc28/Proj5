@@ -121,8 +121,8 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
         if(TempEnt.DType == SXMLEntity::EType::StartElement){
             if(TempEnt.DNameData == "node"){
                 TNodeID  TempId = std::stoul(TempEnt.AttributeValue("id"));
-                double TempLat = std::stoul(TempEnt.AttributeValue("lat"));
-                double TempLon = std::stoul(TempEnt.AttributeValue("lon"));
+                double TempLat = std::stod(TempEnt.AttributeValue("lat"));
+                double TempLon = std::stod(TempEnt.AttributeValue("lon"));
                 node TempNode;
                 TempNode.nodeid = TempId;
                 TempNode.location = std::make_pair(TempLat, TempLon);
