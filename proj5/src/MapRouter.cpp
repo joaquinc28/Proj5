@@ -198,11 +198,8 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
             }
         }
         std::sort(SortedIds.begin(),SortedIds.end());
-       printf ("This line is %d.\n", __LINE__);
 	 CCSVReader readstops(stops);
-	 printf ("This line is %d.\n", __LINE__);
     std::vector<std::string>header;
-    printf ("This line is %d.\n", __LINE__);
     readstops.ReadRow(header);
     size_t StopIndex, NodeIndex;
     for(size_t index = 0; index<header.size();index++){
@@ -226,11 +223,7 @@ bool CMapRouter::LoadMapAndRoutes(std::istream &osm, std::istream &stops, std::i
     }
     std::vector<std::string>sto;
     readstops.ReadRow(sto);
-    std::cout<<i<<std::endl;
-for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeIdToStopID.end(); ++it)
-    std::cout << it->first << " => " << it->second << '\n';
 
-    std::cout<<NodeIdToStopID.size()<<std::endl;
 
     CCSVReader readroutes(routes);
     std::vector<std::string>Header;
@@ -260,11 +253,7 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
 
     std::sort(BusRouteNames.begin(),BusRouteNames.end());
 
-    std::cout<<Routes[0].stops.size()<<std::endl;
-    for(auto c:Routes[0].stops){
-        std::cout<<c<<std::endl;
-    }
-    std::cout<<"please"<<std::endl;
+    
 
      for(int i = 0; i < Routes.size();i++){
         std::string Routename = Routes[i].name;
@@ -284,14 +273,11 @@ for (std::map<int,unsigned long>::iterator it=NodeIdToStopID.begin(); it!=NodeId
                 	TnodeIndex nodeindex = position.find(c)->second;
                 	TempBusedge.path.push_back(nodeindex);
             	}	
-            	std::cout<<TempBusedge.time<<std::endl;
-            	std::cout<<TempBusedge.distance<<std::endl;
                 for(int i = 0;i<TempBusedge.path.size();i++){
                     std::cout<<TempBusedge.path[i]<<std::endl;
                 }		
 
             	NodeIDsToBusEdge[busIDS] = TempBusedge;
-		std::cout<<NodeIDsToBusEdge[busIDS].Routes[0]<<std::endl;
 
            }
 	    else{
@@ -327,16 +313,12 @@ CMapRouter::TNodeID CMapRouter::GetSortedNodeIDByIndex(size_t index) const{
 
 CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) const{
     // Your code HERE
-               printf ("This line is %d.\n", __LINE__);
 
     TLocation emtpy = std::make_pair(180.00,360.00);
-               printf ("This line is %d.\n", __LINE__);
 
     TNodeID id = SortedIds[index];
-               printf ("This line is %d.\n", __LINE__);
 
     auto find = position.find(id);
-               printf ("This line is %d.\n", __LINE__);
     
     if(find == position.end()){
         std::cout<<"why"<<std::endl;
@@ -344,7 +326,6 @@ CMapRouter::TLocation CMapRouter::GetSortedNodeLocationByIndex(size_t index) con
     }
 
     TnodeIndex ind = position.find(id)->second;
-               printf ("This line is %d.\n", __LINE__);
     return nodes[ind].location;
 }
 
