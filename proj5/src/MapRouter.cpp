@@ -24,6 +24,8 @@ double CMapRouter::dkystra(CMapRouter::TnodeIndex src, CMapRouter::TnodeIndex de
     distance[src] = 0.0;
     heap.push_back(src);
     while(!heap.empty()){
+	if(distance[dest] != std::numeric_limits<double>::max())
+		break;
         std::make_heap(heap.begin(),heap.end(),compare);
         std::pop_heap(heap.begin(),heap.end(),compare);
         auto curr  = heap.back();
@@ -420,6 +422,8 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
     double altdistance = 0.0;
     heap.push_back(NewSrc);
     while(!heap.empty()){
+	if(distance[NewDest] != std::numeric_limits<double>::max())
+	    break;	
         std::make_heap(heap.begin(),heap.end(),compare);
         std::pop_heap(heap.begin(),heap.end(),compare);
         auto curr  = heap.back();
@@ -432,11 +436,12 @@ double CMapRouter::FindFastestPath(TNodeID src, TNodeID dest, std::vector< TPath
                 }
                 distance[edge.ConnectedNode] = altdistance;
                 prev[edge.ConnectedNode] = curr;
+		
             }
         }
 
     }
-    if(distance[dest] == std::numeric_limits<double>::max()){
+    if(distance[NewDest] == std::numeric_limits<double>::max()){
        return false;
 }
    auto temp = NewDest;
