@@ -128,6 +128,9 @@ class CMapRouter{
         
         // Returns a simplified set of directions given the input path
         bool GetPathDescription(const std::vector< TPathStep > &path, std::vector< std::string > &desc) const;
+
+	bool GetPathShortest(const std::vector<TNodeID> &path,std::vector<std::string> &desc) const;
+
 };
 
 #endif

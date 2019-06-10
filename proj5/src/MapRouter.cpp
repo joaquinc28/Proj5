@@ -644,4 +644,42 @@ bool CMapRouter::GetPathDescription(const std::vector< TPathStep > &path, std::v
     }
     return true;
 }
+bool CMapRouter::GetPathShortest(const std::vector<CMapRouter::TNodeID> &path, std::vector<std::string> &desc) const {
+    if(path.empty()){
+        return false;
+    }
+
+    for(int i = 0;i<path.size() - 1;i++){
+        if (i == 0){
+            TnodeIndex index = position.find(path[0])->second;
+            TLocation location = nodes[index].location;
+            std::string empty;
+            desc.push_back(helper(location.first,location.second,0,empty));
+
+            TnodeIndex ind2 = position.find(path[1])->second;
+            TLocation loc = nodes[ind2].location;
+            double bear = CalculateBearing(location.first,location.second,loc.first,loc.second);
+            std::string dir = find_direction(bear);
+            desc.push_back(helper(loc.first,loc.second,1,dir));
+        }
+        else{
+            TnodeIndex first = position.find(path[i])->second;
+            TLocation loc = nodes[first].location;
+
+            TnodeIndex sec = position.find(path[i + 1])->second;
+            TLocation loc2 = nodes[sec].location;
+
+            double bear = CalculateBearing(loc.first,loc.second,loc2.first,loc2.second);
+            std::string dir = find_direction(bear);
+            desc.push_back(helper(loc2.first,loc2.second,1,dir));
+        }
+    }
+
+    TnodeIndex last = position.find(path[path.size() - 1])->second;
+    TLocation place = nodes[last].location;
+    std::string empty;
+    desc.push_back(helper(place.first,place.second,2,empty));
+    
+    return true;
+}
 
