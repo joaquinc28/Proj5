@@ -16,6 +16,7 @@
 
 int main(int argc, char* argv[]) {
 	std::string ResultsPath;
+	std::string DataPath;
 	size_t start1;
 	size_t end1 = 0;
 	for(int i = 0; i < argc; i++) {
@@ -38,13 +39,34 @@ int main(int argc, char* argv[]) {
 
 	}
 
-    //parse cmd line args
-    //input file stream for data
+	size_t start2;
+	size_t end2 = 0;
+	for(int i = 0; i < argc; i++) {
+		std::string str2(argv[i]);
+		std::vector<std::string> arg2;
+		while ((start2 = str2.find_first_not_of("/", end2)) != std::string::npos) {
+			end2 = str2.find(" ", start2);
+			printf("Line %d\n", __LINE__);
+			arg2.push_back(str2.substr(start2, end2 - start2));
+			std::cout << "Line "<<__LINE__<<" " << arg2.back() << std::endl;
+			printf("Line %d\n", __LINE__);
+		}
+		for (int j = 0; j < arg2.size(); j++) {
+			if (arg2[j] == "--data=") {
+				for (int k = 0; k < arg2.size(); k++) {
+					DataPath = DataPath + arg2[k];
+				}
+			}
+		}
+
+	}
+
+
 
     //load in maps and routes
     CMapRouter MapRouter;
 
-    std::string DataPath = "data/";
+    DataPath = "data/";
 	ResultsPath = "results/";
 
     std::ifstream osm(DataPath + "davis.osm");
@@ -55,52 +77,49 @@ int main(int argc, char* argv[]) {
 
     std::cout << ">";
 
-	printf("Line %d\n", __LINE__);
+	//printf("Line %d\n", __LINE__);
 
 	std::string input2;
 
-	printf("Line %d\n", __LINE__);
+	//printf("Line %d\n", __LINE__);
 
 	std::vector<CMapRouter::TPathStep> FastestPath;
 	std::vector<CMapRouter::TNodeID> ShortestPath;
 
-	printf("Line %d\n", __LINE__);
+	//printf("Line %d\n", __LINE__);
 
 	int PathType = 0;
 	CMapRouter::TNodeID node1;
 	CMapRouter::TNodeID node2;
 	double DistTime;
 
-	printf("Line %d\n", __LINE__);
+	//printf("Line %d\n", __LINE__);
 
 	std::getline(std::cin, input2);
-	std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
+	//std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
 	std::vector<std::string> input;
 	size_t start;
 	size_t end = 0;
 
 	while ((start = input2.find_first_not_of(" ", end)) != std::string::npos) {
 		end = input2.find(" ", start);
-		printf("Line %d\n", __LINE__);
+		//printf("Line %d\n", __LINE__);
 		input.push_back(input2.substr(start, end - start));
-		std::cout << "Line "<<__LINE__<<" " << input.back() << std::endl;
-		printf("Line %d\n", __LINE__);
+		//std::cout << "Line "<<__LINE__<<" " << input.back() << std::endl;
+		//printf("Line %d\n", __LINE__);
 	}
-	printf("Line %d\n", __LINE__);
+	//printf("Line %d\n", __LINE__);
 
 
     while (input[0] != "exit") {
-		printf("Line %d\n", __LINE__);
+		//printf("Line %d\n", __LINE__);
 
-		//std::cout << input[0];
-
-		//input = StringUtils::Split(input2);
 
         if (input[0] == "help"){
 
 			input.clear();
 			for (int i = 0; i < input.size(); i++) {
-				std::cout << "Line "<<__LINE__<<" " << input[i] << std::endl;
+				//std::cout << "Line "<<__LINE__<<" " << input[i] << std::endl;
 			}
             std::cout << "findroute [--data=path | --resutls=path] \n"
 "------------------------------------------------------------------------\n"
@@ -144,9 +163,14 @@ int main(int argc, char* argv[]) {
 
             double fastest = 0;
             fastest = MapRouter.FindFastestPath(src, dest, FastestPath);
-			DistTime = fastest;
-			PathType = 0;
-            std::cout << "Fastest path takes " << fastest << " hours"<< std::endl;
+			if (fastest == 0) {
+				std::cout << "Unable to find fastest path" << std::endl;
+			}
+			else {
+				DistTime = fastest;
+				PathType = 0;
+            	std::cout << "Fastest path takes " << fastest << " hours"<< std::endl;
+			}
 
         }
         else if (input[0] == "shortest") {
@@ -162,10 +186,14 @@ int main(int argc, char* argv[]) {
 
             double shortest = 0;
             shortest = MapRouter.FindShortestPath(src, dest, ShortestPath);
-			DistTime = shortest;
-			PathType = 1;
-			std::cout << "Shortest path is " << shortest << " miles" << std::endl;
-
+			if (shortest == 0) {
+				std::cout << "Unable to find shortest path" << std::endl;
+			}
+			else {
+				DistTime = shortest;
+				PathType = 1;
+				std::cout << "Shortest path is " << shortest << " miles" << std::endl;
+			}
 
 
         }
@@ -183,6 +211,7 @@ int main(int argc, char* argv[]) {
             filename = ResultsPath + "/" + std::to_string(node1) + "_" + std::to_string(node2) + "_" + std::to_string(DistTime) + ".csv";
 
 			std::ofstream myfile;
+            myfile.open(filename);
 			CCSVWriter writer(myfile);
 			std::vector<std::string> headers;
 			headers.push_back("mode");
@@ -190,9 +219,9 @@ int main(int argc, char* argv[]) {
 			writer.WriteRow(headers);
 
 			//for (int i = 0; i < desc.size(); i++) {
-				writer.WriteRow(desc);
+			writer.WriteRow(desc);
 
-			//}
+			std::cout << "Saved path to " << filename << std::endl;
 
 
 
@@ -220,23 +249,23 @@ int main(int argc, char* argv[]) {
 
 		std::cout << ">";
 		std::getline(std::cin, input2);
-		std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
+		//std::cout << "Line "<<__LINE__<<" " << input2 << std::endl;
 
 		input.clear();
 
 		//StringUtils::Split(input2);
-		printf("Line %d\n", __LINE__);
+		//printf("Line %d\n", __LINE__);
 		end = 0;
 		while ((start = input2.find_first_not_of(" ", end)) != std::string::npos) {
 			end = input2.find(" ", start);
 			input.push_back(input2.substr(start, end - start));
-			printf("Line %d\n", __LINE__);
-			std::cout << "Line "<<__LINE__<<" " << input2.substr(start, end - start) << std::endl;
-			printf("Line %d\n", __LINE__);
-			std::cout << "Line "<<__LINE__<<" " << input.back() << std::endl;
-			printf("Line %d\n", __LINE__);
+			//printf("Line %d\n", __LINE__);
+			//std::cout << "Line "<<__LINE__<<" " << input2.substr(start, end - start) << std::endl;
+			//printf("Line %d\n", __LINE__);
+			//std::cout << "Line "<<__LINE__<<" " << input.back() << std::endl;
+			//printf("Line %d\n", __LINE__);
 		}
-		printf("Line %d\n", __LINE__);
+		//printf("Line %d\n", __LINE__);
     }
 	return 0;
 }
