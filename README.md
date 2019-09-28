@@ -1,4 +1,5 @@
-# Proj5
+# Project 5: Davis, CA Map Router
+# Assignment template and instructions written by Professor Christopher Nitta at the University of California, Davis
 
 Navigation is a critical to modern society. Once source and destination coordinates are translated to vertices, the shortestor fastest path can be calculated to route the user to their destination.
 
